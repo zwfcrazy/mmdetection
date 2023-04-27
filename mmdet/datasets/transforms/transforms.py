@@ -3634,3 +3634,10 @@ class CachedMixUp(BaseTransform):
         repr_str += f'random_pop={self.random_pop}, '
         repr_str += f'prob={self.prob})'
         return repr_str
+
+
+@TRANSFORMS.register_module()
+class DummyScale(BaseTransform):
+    def transform(self, results: dict) -> Union[dict, None]:
+        results['scale_factor'] = (1.0, 1.0)
+        return results

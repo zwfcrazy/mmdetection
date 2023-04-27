@@ -135,6 +135,19 @@ class MultiBranch(BaseTransform):
 
 
 @TRANSFORMS.register_module()
+class SharedMultiBranch(MultiBranch):
+    def __init__(self, shared_pipeline: dict,
+                 branch_field: List[str],
+                 **branch_pipelines: dict) -> None:
+        super().__init__(branch_field, **branch_pipelines)
+        self.shared_pipeline = Compose(shared_pipeline)
+
+    def transform(self, results: dict) -> dict:
+        results = self.shared_pipeline(results)
+        return super().transform(results)
+
+
+@TRANSFORMS.register_module()
 class RandomOrder(Compose):
     """Shuffle the transform Sequence."""
 

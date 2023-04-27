@@ -566,6 +566,45 @@ class MultiBranchDataPreprocessor(BaseDataPreprocessor):
 
 
 @MODELS.register_module()
+class SemiDataPreprocessor(MultiBranchDataPreprocessor):
+    def __init__(self, data_preprocessor: ConfigType) -> None:
+        super().__init__(data_preprocessor)
+        
+    def forward(self, data: dict, training: bool = False) -> dict:
+        if training is False:
+            return self.data_preprocessor(data, training)
+
+        # Group data by branch
+        multi_branch_data = {}
+        for key in data.keys():
+            for branch in data[key].keys():
+                if multi_branch_data.get(branch, None) is None:
+                    multi_branch_data[branch] = {key: data[key][branch]}
+                elif multi_branch_data[branch].get(key, None) is None:
+                    multi_branch_data[branch][key] = data[key][branch]
+                else:
+                    multi_branch_data[branch][key].append(data[key][branch])
+
+        # Preprocess data from different branches
+        multi_branch_data['teacher'] = self.data_preprocessor(multi_branch_data['teacher'], False)
+        multi_branch_data['student'] = self.data_preprocessor(multi_branch_data['student'], True)
+
+        # Format data by inputs and data_samples
+        format_data = {}
+        for branch in multi_branch_data.keys():
+            for key in multi_branch_data[branch].keys():
+                if format_data.get(key, None) is None:
+                    format_data[key] = {branch: multi_branch_data[branch][key]}
+                elif format_data[key].get(branch, None) is None:
+                    format_data[key][branch] = multi_branch_data[branch][key]
+                else:
+                    format_data[key][branch].append(
+                        multi_branch_data[branch][key])
+
+        return format_data
+
+
+@MODELS.register_module()
 class BatchResize(nn.Module):
     """Batch resize during training. This implementation is modified from
     https://github.com/Purkialo/CrowdDet/blob/master/lib/data/CrowdHuman.py.

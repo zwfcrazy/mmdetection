@@ -382,6 +382,21 @@ class RandomFlip(MMCV_RandomFlip):
         else:
             results['homography_matrix'] = homography_matrix @ results[
                 'homography_matrix']
+            
+    def _flip_on_direction(self, results: dict) -> None:
+        """Function to flip images, bounding boxes, semantic segmentation map
+        and keypoints."""
+        cur_dir = self._choose_direction()
+        if cur_dir is None:
+            results['flip'] = False
+            results['flip_direction'] = None
+        else:
+            results['flip'] = True
+            results['flip_direction'] = cur_dir
+            self._flip(results)
+            
+        # record homography matrix for flip
+        self._record_homography_matrix(results)
 
     @autocast_box_type()
     def _flip(self, results: dict) -> None:
@@ -405,9 +420,6 @@ class RandomFlip(MMCV_RandomFlip):
         if results.get('gt_seg_map', None) is not None:
             results['gt_seg_map'] = mmcv.imflip(
                 results['gt_seg_map'], direction=results['flip_direction'])
-
-        # record homography matrix for flip
-        self._record_homography_matrix(results)
 
 
 @TRANSFORMS.register_module()

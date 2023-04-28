@@ -11,7 +11,7 @@ from .objects365 import Objects365V1Dataset, Objects365V2Dataset
 from .openimages import OpenImagesChallengeDataset, OpenImagesDataset
 from .samplers import (AspectRatioBatchSampler, ClassAwareSampler,
                        GroupMultiSourceSampler, MultiSourceSampler)
-from .utils import get_loading_pipeline, semi_collate
+from .utils import get_loading_pipeline, semi_collate, semi_yolov5_collate
 from .voc import VOCDataset
 from .wider_face import WIDERFaceDataset
 from .xml_style import XMLDataset
@@ -23,5 +23,5 @@ __all__ = [
     'MultiImageMixDataset', 'OpenImagesDataset', 'OpenImagesChallengeDataset',
     'AspectRatioBatchSampler', 'ClassAwareSampler', 'MultiSourceSampler',
     'GroupMultiSourceSampler', 'BaseDetDataset', 'CrowdHumanDataset',
-    'Objects365V1Dataset', 'Objects365V2Dataset', 'semi_collate'
+    'Objects365V1Dataset', 'Objects365V2Dataset', 'semi_collate', 'semi_yolov5_collate'
 ]

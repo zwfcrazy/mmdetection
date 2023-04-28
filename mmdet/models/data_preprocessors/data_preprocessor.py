@@ -830,3 +830,47 @@ class BoxInstDataPreprocessor(DetDataPreprocessor):
                     per_im_masks.cpu().numpy(), b_img_h, b_img_w)
                 data_sample.gt_instances.pairwise_masks = pairwise_masks
         return {'inputs': inputs, 'data_samples': data_samples}
+
+
+@MODELS.register_module()
+class SemiYOLOv5DetDataPreprocessor(DetDataPreprocessor):
+    """Rewrite collate_fn to get faster training speed.
+
+    Note: It must be used together with `mmyolo.datasets.utils.yolov5_collate`
+    """
+
+    def __init__(self, *args, non_blocking: Optional[bool] = True, **kwargs):
+        super().__init__(*args, non_blocking=non_blocking, **kwargs)
+
+    def forward(self, data: dict, training: bool = False) -> dict:
+        """Perform normalization, padding and bgr2rgb conversion based on
+        ``DetDataPreprocessorr``.
+
+        Args:
+            data (dict): Data sampled from dataloader.
+            training (bool): Whether to enable training time augmentation.
+
+        Returns:
+            dict: Data in the same format as the model input.
+        """
+        if not training:
+            return super().forward(data, training)
+
+        data = self.cast_data(data)
+        inputs, data_samples = data['inputs'], data['data_samples']
+        assert isinstance(data['data_samples'], dict)
+
+        # TODO: Supports multi-scale training
+        if self._channel_conversion and inputs.shape[1] == 3:
+            inputs = inputs[:, [2, 1, 0], ...]
+        if self._enable_normalize:
+            inputs = (inputs - self.mean) / self.std
+
+        if self.batch_augments is not None:
+            for batch_aug in self.batch_augments:
+                inputs, data_samples = batch_aug(inputs, data_samples)
+
+        img_metas = [{'batch_input_shape': inputs.shape[2:]}] * len(inputs)
+        data_samples['img_metas'] = img_metas
+
+        return {'inputs': inputs, 'data_samples': data_samples}

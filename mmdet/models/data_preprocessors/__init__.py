@@ -3,10 +3,11 @@ from .data_preprocessor import (BatchFixedSizePad, BatchResize,
                                 BatchSyncRandomResize, BoxInstDataPreprocessor,
                                 DetDataPreprocessor,
                                 MultiBranchDataPreprocessor,
-                                SemiDataPreprocessor)
+                                SemiDataPreprocessor,
+                                SemiYOLOv5DetDataPreprocessor)
 
 __all__ = [
     'DetDataPreprocessor', 'BatchSyncRandomResize', 'BatchFixedSizePad',
     'MultiBranchDataPreprocessor', 'BatchResize', 'BoxInstDataPreprocessor',
-    'SemiDataPreprocessor'
+    'SemiDataPreprocessor', 'SemiYOLOv5DetDataPreprocessor'
 ]

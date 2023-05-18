@@ -1,9 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import collections
 import copy
-from typing import Sequence, Union
+from typing import Sequence, Union, List
 
-from mmengine.dataset import BaseDataset, force_full_init
+from mmengine.dataset import BaseDataset, force_full_init, ConcatDataset
 
 from mmdet.registry import DATASETS, TRANSFORMS
 
@@ -167,3 +167,15 @@ class MultiImageMixDataset:
             isinstance(skip_type_key, str) for skip_type_key in skip_type_keys
         ])
         self._skip_type_keys = skip_type_keys
+
+
+@DATASETS.register_module()
+class SemiConcatDataset(ConcatDataset):
+    def __init__(self,
+                 datasets: Sequence[Union[BaseDataset, dict]],
+                 metainfo: dict = None,
+                 lazy_init: bool = False,
+                 ignore_keys: Union[str, List[str], None] = None):
+        super().__init__(datasets, lazy_init, ignore_keys)
+        if metainfo is not None:
+            self._metainfo = metainfo

@@ -69,7 +69,9 @@ class CocoDataset(BaseDetDataset):
         # change with the order of the `classes`
         self.cat_ids = self.coco.get_cat_ids(
             cat_names=self.metainfo['classes'])
-        self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
+        if self.label_ids is None:
+            self.label_ids = list(range(len(self.cat_ids)))
+        self.cat2label = {cat_id: i for i, cat_id in zip(self.label_ids, self.cat_ids)}
         self.cat_img_map = copy.deepcopy(self.coco.cat_img_map)
 
         img_ids = self.coco.get_img_ids()

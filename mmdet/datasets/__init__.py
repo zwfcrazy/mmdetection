@@ -4,7 +4,7 @@ from .cityscapes import CityscapesDataset
 from .coco import CocoDataset
 from .coco_panoptic import CocoPanopticDataset
 from .crowdhuman import CrowdHumanDataset
-from .dataset_wrappers import MultiImageMixDataset
+from .dataset_wrappers import MultiImageMixDataset, SemiConcatDataset
 from .deepfashion import DeepFashionDataset
 from .lvis import LVISDataset, LVISV1Dataset, LVISV05Dataset
 from .objects365 import Objects365V1Dataset, Objects365V2Dataset
@@ -23,5 +23,6 @@ __all__ = [
     'MultiImageMixDataset', 'OpenImagesDataset', 'OpenImagesChallengeDataset',
     'AspectRatioBatchSampler', 'ClassAwareSampler', 'MultiSourceSampler',
     'GroupMultiSourceSampler', 'BaseDetDataset', 'CrowdHumanDataset',
-    'Objects365V1Dataset', 'Objects365V2Dataset', 'semi_collate', 'semi_yolov5_collate'
+    'Objects365V1Dataset', 'Objects365V2Dataset', 'semi_collate', 'semi_yolov5_collate',
+    'SemiConcatDataset'
 ]

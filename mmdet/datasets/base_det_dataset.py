@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import os.path as osp
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from mmengine.dataset import BaseDataset
 from mmengine.fileio import load
@@ -23,11 +23,13 @@ class BaseDetDataset(BaseDataset):
 
     def __init__(self,
                  *args,
+                 label_ids: Optional[Sequence[int]] = None,
                  seg_map_suffix: str = '.png',
                  proposal_file: Optional[str] = None,
                  file_client_args: dict = None,
                  backend_args: dict = None,
                  **kwargs) -> None:
+        self.label_ids = label_ids
         self.seg_map_suffix = seg_map_suffix
         self.proposal_file = proposal_file
         self.backend_args = backend_args

@@ -158,39 +158,17 @@ test_pipeline = [
 
 # persistent_workers must be False if num_workers is 0
 persistent_workers = True
-pin_memory = False
+pin_memory = True
 # Batch size of a single GPU during training
 train_batch_size_per_gpu = 32
 # Worker to pre-fetch data for each single GPU during training
-train_num_workers = 8
+train_num_workers = 16
 # Batch size of a single GPU during validation
 val_batch_size_per_gpu = 16
 # Worker to pre-fetch data for each single GPU during validation
 val_num_workers = 8
 
 train_dataset1 = dict(
-    type=dataset_type,
-    data_root=data_root,
-    ann_file='CrowdHuman/annotation_train_coco.json',
-    data_prefix=dict(img='CrowdHuman/images/train'),
-    metainfo=dict(classes=('person', ), palette=[(220, 20, 60)]),
-    label_ids=[0],
-    filter_cfg=dict(filter_empty_gt=True, min_size=32),
-    pipeline=train_pipeline,
-    backend_args=backend_args)
-
-train_dataset2 = dict(
-    type=dataset_type,
-    data_root=data_root,
-    ann_file='AIC/ai_challenger_keypoint_train_20170909/keypoint_train_annotations_20170909_coco.json',
-    data_prefix=dict(img='AIC/ai_challenger_keypoint_train_20170909/keypoint_train_images_20170902'),
-    metainfo=dict(classes=('person', ), palette=[(220, 20, 60)]),
-    label_ids=[0],
-    filter_cfg=dict(filter_empty_gt=True, min_size=32),
-    pipeline=train_pipeline,
-    backend_args=backend_args)
-
-train_dataset3 = dict(
     type=dataset_type,
     data_root=data_root,
     ann_file='coco2017/annotations/instances_train2017.json',
@@ -201,46 +179,13 @@ train_dataset3 = dict(
     pipeline=train_pipeline,
     backend_args=backend_args)
 
-train_dataset4 = dict(
+train_dataset2 = dict(
     type=dataset_type,
     data_root=data_root,
-    ann_file='school/pose/pullup/pullup01/cocoformat_annotations.json',
-    data_prefix=dict(img='school/pose/pullup/pullup01/images'),
-    metainfo=dict(classes=('person', ), palette=[(220, 20, 60)]),
-    label_ids=[0],
-    filter_cfg=dict(filter_empty_gt=True, min_size=32),
-    pipeline=train_pipeline,
-    backend_args=backend_args)
-
-train_dataset5 = dict(
-    type=dataset_type,
-    data_root=data_root,
-    ann_file='school/pose/situp/situp_b2/cocoformat_annotations.json',
-    data_prefix=dict(img='school/pose/situp/situp_b2/images'),
-    metainfo=dict(classes=('person', ), palette=[(220, 20, 60)]),
-    label_ids=[0],
-    filter_cfg=dict(filter_empty_gt=True, min_size=32),
-    pipeline=train_pipeline,
-    backend_args=backend_args)
-
-train_dataset6 = dict(
-    type=dataset_type,
-    data_root=data_root,
-    ann_file='school/pose/situp/situp_b3/cocoformat_annotations.json',
-    data_prefix=dict(img='school/pose/situp/situp_b3/images'),
-    metainfo=dict(classes=('person', ), palette=[(220, 20, 60)]),
-    label_ids=[0],
-    filter_cfg=dict(filter_empty_gt=True, min_size=32),
-    pipeline=train_pipeline,
-    backend_args=backend_args)
-
-train_dataset7 = dict(
-    type=dataset_type,
-    data_root=data_root,
-    ann_file='objects365/zhiyuan_objv2_train_filtered.json',
-    data_prefix=dict(img='objects365/images/train'),
-    metainfo=dict(classes=('Sneakers', ), palette=[(255, 77, 255)]),
-    label_ids=[1],
+    ann_file='coco2017/annotations/instances_train2017.json',
+    data_prefix=dict(img='coco2017/train2017/'),
+    metainfo=dict(classes=('cat', 'dog'), palette=[(255, 77, 255), (0, 226, 252)]),
+    label_ids=[1, 2],
     filter_cfg=dict(filter_empty_gt=True, min_size=32),
     pipeline=train_pipeline,
     backend_args=backend_args)
@@ -248,10 +193,10 @@ train_dataset7 = dict(
 val_dataset = dict(
     type=dataset_type,
     data_root=data_root,
-    ann_file='objects365/zhiyuan_objv2_val_filtered.json',
-    data_prefix=dict(img='objects365/images/val'),
-    metainfo=dict(classes=('Person', 'Sneakers'), palette=[(220, 20, 60), (255, 77, 255)]),
-    label_ids=[0, 1],
+    ann_file='coco2017/annotations/instances_val2017.json',
+    data_prefix=dict(img='coco2017/val2017/'),
+    metainfo=dict(classes=('person', 'cat', 'dog'), palette=[(220, 20, 60), (255, 77, 255), (0, 226, 252)]),
+    label_ids=[0, 1, 2],
     test_mode=True,
     pipeline=test_pipeline,
     backend_args=backend_args)
@@ -271,16 +216,11 @@ train_dataloader = dict(
         type='SemiConcatDataset',
         datasets=[
             train_dataset1, 
-            train_dataset2,
-            train_dataset3,
-            train_dataset4,
-            train_dataset5,
-            train_dataset6,
-            train_dataset7,
+            train_dataset2
         ],
         metainfo=dict(
-            classes=('person', 'sneakers'), 
-            palette=[(220, 20, 60), (255, 77, 255)]),
+            classes=('person', 'cat', 'dog'), 
+            palette=[(220, 20, 60), (255, 77, 255), (0, 226, 252)]),
         ignore_keys=['classes', 'palette']
     ))
 
@@ -296,7 +236,7 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 # ---- model -----
-num_classes = 2
+num_classes = 3
 # The scaling factor that controls the depth of the network structure
 deepen_factor = 0.33
 # The scaling factor that controls the width of the network structure
@@ -412,14 +352,14 @@ model = dict(
 # -----train val related-----
 # Base learning rate for optim_wrapper. Corresponding to 8xb16=64 bs
 base_lr = 0.01
-max_epochs = 300  # Maximum training epochs
+max_epochs = 500  # Maximum training epochs
 # Disable mosaic augmentation for final 10 epochs (stage 2)
 close_mosaic_epochs = 10
 
 lr_factor = 0.01  # Learning rate scaling factor
 weight_decay = 0.0005
 # Save model checkpoint and validation intervals in stage 1
-save_epoch_intervals = 5
+save_epoch_intervals = 10
 # validation intervals in stage 2
 val_interval_stage2 = 1
 # The maximum checkpoints to keep.
@@ -427,8 +367,6 @@ max_keep_ckpts = 2
 # Single-scale training is recommended to
 # be turned on, which can speed up training.
 env_cfg = dict(cudnn_benchmark=True)
-
-auto_scale_lr = dict(base_batch_size=128)
 
 # train_cfg = dict(
 #     type='EpochBasedTrainLoop',
@@ -493,7 +431,7 @@ custom_hooks = [dict(type='MeanTeacherHook', momentum=0.001, skip_buffer=False)]
 
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'objects365/zhiyuan_objv2_val_filtered.json',
+    ann_file=data_root + 'coco2017/annotations/instances_val2017.json',
     metric='bbox',
     proposal_nums=(100, 1, 10))
 test_evaluator = val_evaluator

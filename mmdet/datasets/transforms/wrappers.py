@@ -112,6 +112,7 @@ class MultiBranch(BaseTransform):
         for branch in self.branch_field:
             multi_results[branch] = {'inputs': None, 'data_samples': None}
         for branch, pipeline in self.branch_pipelines.items():
+            results.pop('dataset', None)
             branch_results = pipeline(copy.deepcopy(results))
             # If one branch pipeline returns None,
             # it will sample another data from dataset.
